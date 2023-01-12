@@ -45,9 +45,9 @@
 # that to avoid false triggering.)
 :htere        -> there
 abbout        -> about
-abotu         -> about
+:abotu        -> about
 baout         -> about
-:theri        -> their
+:theri:       -> their
 :thier        -> their
 :owudl        -> would
 woudl         -> would
@@ -94,9 +94,9 @@ beeing        -> being
 :hwile        -> while
 
 ## Common words, 21-30.
-aroud         -> around
+:aroud         -> around
 arround       -> around
-arund         -> around
+arund:       -> around
 thign         -> thing
 thigsn        -> things
 thnigs        -> things
@@ -125,7 +125,7 @@ chekc         -> check
 childen       -> children
 claer         -> clear
 comapny       -> company
-contian       -> contain
+:contian      -> contain
 elasped       -> elapsed
 feild         -> field
 fitler        -> filter
@@ -134,10 +134,10 @@ follwo        -> follow
 :foudn        -> found
 frequecy      -> frequency
 firend        -> friend
-freind        -> friend
+:freind        -> friend
 heigth        -> height
 iamge         -> image
-inital        -> initial
+:inital       -> initial
 intput        -> input
 laguage       -> language
 lenght        -> length
@@ -151,7 +151,7 @@ probaly       -> probably
 probelm       -> problem
 recrod        -> record
 reponse       -> response
-reprot        -> report
+reprot:      -> report
 singel        -> single
 stregth       -> strength
 strengh       -> strength
@@ -174,7 +174,7 @@ alledge       -> allege
 amature       -> amateur
 anomolous     -> anomalous
 anomoly       -> anomaly
-aparent       -> apparent
+:aparent      -> apparent
 aparrent      -> apparent
 apparant      -> apparent
 apparrent     -> apparent
@@ -213,7 +213,7 @@ hypocracy     -> hypocrisy
 hypocrasy     -> hypocrisy
 hypocricy     -> hypocrisy
 hypocrit:     -> hypocrite
-looses:       -> loses
+# :looses:      -> loses
 maintence     -> maintenance
 morgage       -> mortgage
 neccesary     -> necessary
@@ -254,9 +254,9 @@ dyanmic       -> dynamic
 # As in "execute", "executable", "executing", ...
 excecut       -> execut
 failse        -> false
-fales         -> false
+:fales         -> false
 fasle         -> false
-flase         -> false
+flase:       -> false
 indeces       -> indices
 indecies      -> indices
 indicies      -> indices
@@ -266,21 +266,21 @@ namesapce     -> namespace
 namespcae     -> namespace
 nulltpr       -> nullptr
 operaotr      -> operator
-overide       -> override
+overide:     -> override
 ovveride      -> override
 poitner       -> pointer
 :rference     -> reference
 referece      -> reference
-singed        -> signed
+# :singed:      -> signed
 stirng        -> string
 strign        -> string
 swithc        -> switch
 swtich        -> switch
 teamplate     -> template
 tempalte      -> template
-:ture         -> true
+:ture:        -> true
 retrun        -> return
-retun         -> return
+retun:       -> return
 reutrn        -> return
 cosnt         -> const
 virutal       -> virtual
@@ -292,24 +292,24 @@ yeild         -> yield
 :alot:        -> a lot
 :andteh       -> and the
 :andthe       -> and the
-:asthe        -> as the
+:asthe:       -> as the
 :atthe        -> at the
-abouta        -> about a
-aboutit       -> about it
+# :abouta:      -> about a
+# aboutit       -> about it
 aboutthe      -> about the
-:tothe        -> to the
+:tothe:       -> to the
 didnot        -> did not
 fromthe       -> from the
 
 
 ## Various additional entries.
 :agred        -> agreed
-:ajust        -> adjust
+:ajust:       -> adjust
 :anual        -> annual
 :asign        -> assign
 :aslo:        -> also
-:casue        -> cause
-:choses       -> chooses
+:casue:       -> cause
+# :choses       -> chooses
 :gaurd        -> guard
 :haev         -> have
 :hapen        -> happen
@@ -339,13 +339,13 @@ acurate       -> accurate
 acutally      -> actually
 addtion       -> addition
 againnst      -> against
-aganist       -> against
+:aganist      -> against
 aggreed       -> agreed
 agianst       -> against
 ahppn         -> happen
 allign        -> align
 anytying      -> anything
-aquire        -> acquire
+:aquire       -> acquire
 availabe      -> available
 availaible    -> available
 availalbe     -> available
@@ -366,14 +366,14 @@ caluculate    -> calculate
 calulate      -> calculate
 catagory      -> category
 cauhgt        -> caught
-ceratin       -> certain
-certian       -> certain
+:ceratin      -> certain
+:certian      -> certain
 cheif         -> chief
 cieling       -> ceiling
 circut        -> circuit
 clasic        -> classic
 cmoputer      -> computer
-coform        -> conform
+coform:      -> conform
 comming:      -> coming
 considerd     -> considered
 dervied       -> derived
@@ -382,7 +382,7 @@ diferent      -> different
 diferrent     -> different
 differnt      -> different
 diffrent      -> different
-divison       -> division
+divison:      -> division
 effecient     -> efficient
 eligable      -> eligible
 elpased       -> elapsed
@@ -430,7 +430,7 @@ perhpas       -> perhaps
 perphas       -> perhaps
 persue        -> pursue
 posess        -> possess
-postion       -> position
+postion:      -> position
 preiod        -> period
 primarly      -> primarily
 privte        -> private
@@ -459,7 +459,7 @@ succsess      -> success
 sugest        -> suggest
 sumary        -> summary
 supress       -> suppress
-surpress      -> suppress
+surpress:     -> suppress
 thresold      -> threshold
 tongiht       -> tonight
 tranpose      -> transpose
@@ -468,6 +468,6 @@ udpate        -> update
 ususally      -> usually
 verticies     -> vertices
 whereever     -> wherever
-wherre        -> where
+wherre:       -> where
 wierd         -> weird
 

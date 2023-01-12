@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Copyright 2021-2022 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,10 +50,12 @@ https://getreuer.info/posts/keyboards/autocorrection
 import os.path
 import sys
 import textwrap
+import argparse
 from typing import Any, Dict, Iterator, List, Tuple
 
 try:
-  from english_words import english_words_lower_alpha_set as CORRECT_WORDS
+  from english_words import get_english_words_set
+  CORRECT_WORDS = get_english_words_set(['web2'], alpha=True, lower=True)
 except ImportError:
   print('Autocorrection will falsely trigger when a typo is a substring of a '
         'correctly spelled word. To check for this, install the english_words '
@@ -64,8 +67,34 @@ except ImportError:
                    'manual', 'nothing', 'provides', 'reference', 'statehood',
                    'technology', 'virtually', 'wealthier', 'wonderful')
 
+
+# https://github.com/words
+
+from english import english
+CORRECT_WORDS.update(english)
+languages = ['en', 'en_US', 'en_GB']
+
+from french import french
+CORRECT_WORDS.update(french)
+languages += ['fr', 'fr_FR']
+
+# from spanish import spanish
+# CORRECT_WORDS.update(spanish)
+# languages += ['es', 'es_ES']
+
+# from german import german
+# CORRECT_WORDS.update(german)
+# languages += ['de', 'de_DE']
+
+
+import enchant
+dicts = [enchant.Dict(l) for l in languages]
+def check_word(word):
+    return any(d.check(word) for d in dicts)
+
 KC_A = 4
 KC_SPC = 0x2c
+KC_SCOLON = 0x33
 KC_QUOT = 0x34
 
 TYPO_CHARS = dict(
@@ -77,6 +106,16 @@ TYPO_CHARS = dict(
   [(chr(c), c + KC_A - ord('a')) for c in range(ord('a'), ord('z') + 1)]
 )
 
+parser = argparse.ArgumentParser()
+parser.add_argument('dict_filename', nargs='?', default=None)
+parser.add_argument('header_filename', nargs='?', default=None)
+parser.add_argument('-l', '--layout', default=None)
+args = parser.parse_args()
+
+# ./make_autocorrection_data.py autocorrection_dict_extra_colemak.txt -l colemak
+if args.layout == 'colemak':
+    TYPO_CHARS[';'] = KC_SCOLON
+    del TYPO_CHARS['p']
 
 def parse_file(file_name: str) -> List[Tuple[str, str]]:
   """Parses autocorrections dictionary file.
@@ -166,22 +205,22 @@ def check_typo_against_dictionary(line_number: int, typo: str) -> None:
   """Checks `typo` against English dictionary words."""
 
   if typo.startswith(':') and typo.endswith(':'):
-    if typo[1:-1] in CORRECT_WORDS:
+    if typo[1:-1] in CORRECT_WORDS and check_word(typo[1:-1]):
       print(f'Warning:{line_number}: Typo "{typo}" is a correctly spelled '
             'dictionary word.')
   elif typo.startswith(':') and not typo.endswith(':'):
     for word in CORRECT_WORDS:
-      if word.startswith(typo[1:]):
+      if word.startswith(typo[1:]) and check_word(word):
         print(f'Warning:{line_number}: Typo "{typo}" would falsely trigger '
               f'on correctly spelled word "{word}".')
   elif not typo.startswith(':') and typo.endswith(':'):
     for word in CORRECT_WORDS:
-      if word.endswith(typo[:-1]):
+      if word.endswith(typo[:-1]) and check_word(word):
         print(f'Warning:{line_number}: Typo "{typo}" would falsely trigger '
               f'on correctly spelled word "{word}".')
   elif not typo.startswith(':') and not typo.endswith(':'):
     for word in CORRECT_WORDS:
-      if typo in word:
+      if typo in word and check_word(word):
         print(f'Warning:{line_number}: Typo "{typo}" would falsely trigger '
               f'on correctly spelled word "{word}".')
 
@@ -300,8 +339,8 @@ def get_default_h_file(dict_file: str) -> str:
 
 
 def main(argv):
-  dict_file = argv[1] if len(argv) > 1 else 'autocorrection_dict.txt'
-  h_file = argv[2] if len(argv) > 2 else get_default_h_file(dict_file)
+  dict_file = args.dict_filename or 'autocorrection_dict.txt'
+  h_file = args.header_filename or get_default_h_file(dict_file)
 
   autocorrections = parse_file(dict_file)
   trie = make_trie(autocorrections)

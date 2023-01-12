@@ -37,6 +37,14 @@
 #error "Min typo length is less than 4. Autocorrection may behave poorly."
 #endif
 
+__attribute__((weak)) bool autocorrection_is_letter(uint16_t keycode) {
+    return KC_A <= keycode && keycode <= KC_Z;
+}
+
+__attribute__((weak)) bool autocorrection_is_boundary(uint16_t keycode) {
+    return KC_1 <= keycode && keycode <= KC_SLSH;
+}
+
 bool process_autocorrection(uint16_t keycode, keyrecord_t* record) {
   static uint8_t typo_buffer[AUTOCORRECTION_MAX_LENGTH] = {0};
   static uint8_t typo_buffer_size = 0;
@@ -111,14 +119,14 @@ bool process_autocorrection(uint16_t keycode, keyrecord_t* record) {
     if ((mods & MOD_MASK_SHIFT) != 0) {
       keycode = KC_SPC;
     }
-  } else if (!(KC_A <= keycode && keycode <= KC_Z)) {
+  } else if (!autocorrection_is_letter(keycode)) {
     if (keycode == KC_BSPC) {
       // Remove last character from the buffer.
       if (typo_buffer_size > 0) {
         --typo_buffer_size;
       }
       return true;
-    } else if (KC_1 <= keycode && keycode <= KC_SLSH && keycode != KC_ESC) {
+    } else if (autocorrection_is_boundary(keycode) && keycode != KC_ESC) {
       // Set a word boundary if space, period, digit, etc. is pressed.
       // Behave more conservatively for the enter key. Reset, so that enter
       // can't be used on a word ending.
