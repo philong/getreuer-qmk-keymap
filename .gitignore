@@ -8,3 +8,5 @@ tools/qmk_song_player/song_test.js
 **/node_modules
 **/package-lock.json
 
+.venv
+__pycache__
