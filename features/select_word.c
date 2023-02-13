@@ -47,6 +47,8 @@ void select_word_task(void) {
 }
 #endif  // SELECT_WORD_TIMEOUT > 0
 
+bool mac_hotkeys(void) { return keymap_config.swap_lctl_lgui; }
+
 bool process_select_word(uint16_t keycode, keyrecord_t* record,
                          uint16_t sel_keycode) {
   if (keycode == KC_LSFT || keycode == KC_RSFT) {
@@ -67,11 +69,11 @@ bool process_select_word(uint16_t keycode, keyrecord_t* record,
 #endif  // NO_ACTION_ONESHOT
 
     if (!shifted) {  // Select word.
-#ifdef MAC_HOTKEYS
+if (mac_hotkeys()) {
       set_mods(MOD_BIT(KC_LALT));  // Hold Left Alt (Option).
-#else
+} else {
       set_mods(MOD_BIT(KC_LCTL));  // Hold Left Ctrl.
-#endif  // MAC_HOTKEYS
+}  // MAC_HOTKEYS
       if (state == STATE_NONE) {
         // On first use, tap Ctrl+Right then Ctrl+Left (or with Alt on Mac) to
         // ensure the cursor is positioned at the beginning of the word.
@@ -84,21 +86,21 @@ bool process_select_word(uint16_t keycode, keyrecord_t* record,
       state = STATE_WORD;
     } else {  // Select line.
       if (state == STATE_NONE) {
-#ifdef MAC_HOTKEYS
+if (mac_hotkeys()) {
         // Tap GUI (Command) + Left, then Shift + GUI + Right.
         set_mods(MOD_BIT(KC_LGUI));
         send_keyboard_report();
         tap_code(KC_LEFT);
         register_mods(MOD_BIT(KC_LSFT));
         tap_code(KC_RGHT);
-#else
+} else {
         // Tap Home, then Shift + End.
         clear_mods();
         send_keyboard_report();
         tap_code(KC_HOME);
         register_mods(MOD_BIT(KC_LSFT));
         tap_code(KC_END);
-#endif  // MAC_HOTKEYS
+}  // MAC_HOTKEYS
         set_mods(mods);
         state = STATE_FIRST_LINE;
       } else {
@@ -113,11 +115,11 @@ bool process_select_word(uint16_t keycode, keyrecord_t* record,
   switch (state) {
     case STATE_WORD:
       unregister_code(KC_RGHT);
-#ifdef MAC_HOTKEYS
+if (mac_hotkeys()) {
       unregister_mods(MOD_BIT(KC_LSFT) | MOD_BIT(KC_LALT));
-#else
+} else {
       unregister_mods(MOD_BIT(KC_LSFT) | MOD_BIT(KC_LCTL));
-#endif  // MAC_HOTKEYS
+}  // MAC_HOTKEYS
       state = STATE_SELECTED;
       break;
 
