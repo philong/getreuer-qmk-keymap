@@ -92,13 +92,17 @@ dicts = [enchant.Dict(l) for l in languages]
 def check_word(word):
     return any(d.check(word) for d in dicts)
 
+# colemak
+tr = str.maketrans('abcsftdhuneimky;qprglvwxjzo', 'abcdefghijklmnopqrstuvwxyz;')
+
 KC_A = 4
 KC_SPC = 0x2c
-KC_SCOLON = 0x33
+KC_SCLN = 0x33
 KC_QUOT = 0x34
 
 TYPO_CHARS = dict(
   [
+    (";", KC_SCLN),
     ("'", KC_QUOT),
     (':', KC_SPC),  # "Word break" character.
   ] +
@@ -114,10 +118,10 @@ args = parser.parse_args()
 
 # ./make_autocorrection_data.py autocorrection_dict_extra_colemak.txt -l colemak
 if args.layout == 'colemak':
-    TYPO_CHARS[';'] = KC_SCOLON
+    TYPO_CHARS[';'] = KC_SCLN
     del TYPO_CHARS['p']
 
-def parse_file(file_name: str) -> List[Tuple[str, str]]:
+def parse_file(file_name: str) -> List[Tuple[str, str, str]]:
   """Parses autocorrections dictionary file.
 
   Each line of the file defines one typo and its correction with the syntax
@@ -156,13 +160,13 @@ def parse_file(file_name: str) -> List[Tuple[str, str]]:
 
     check_typo_against_dictionary(line_number, typo)
 
-    autocorrections.append((typo, correction))
+    autocorrections.append((typo.translate(tr), typo, correction))
     typos.add(typo)
 
   return autocorrections
 
 
-def make_trie(autocorrections: List[Tuple[str, str]]) -> Dict[str, Any]:
+def make_trie(autocorrections: List[Tuple[str, str, str]]) -> Dict[str, Any]:
   """Makes a trie from the the typos, writing in reverse.
 
   Args:
@@ -171,7 +175,7 @@ def make_trie(autocorrections: List[Tuple[str, str]]) -> Dict[str, Any]:
     Dict of dict, representing the trie.
   """
   trie = {}
-  for typo, correction in autocorrections:
+  for typo, text, correction in autocorrections:
     node = trie
     for letter in typo[::-1]:
       node = node.setdefault(letter, {})
@@ -225,7 +229,7 @@ def check_typo_against_dictionary(line_number: int, typo: str) -> None:
               f'on correctly spelled word "{word}".')
 
 
-def serialize_trie(autocorrections: List[Tuple[str, str]],
+def serialize_trie(autocorrections: List[Tuple[str, str, str]],
                    trie: Dict[str, Any]) -> List[int]:
   """Serializes trie and correction data in a form readable by the C code.
 
@@ -317,13 +321,13 @@ def write_generated_code(autocorrections: List[Tuple[str, str]],
   def typo_len(e: Tuple[str, str]) -> int:
     return len(e[0])
 
-  min_typo = min(autocorrections, key=typo_len)[0]
-  max_typo = max(autocorrections, key=typo_len)[0]
+  min_typo = min(autocorrections, key=typo_len)[1]
+  max_typo = max(autocorrections, key=typo_len)[1]
   generated_code = ''.join([
     '// Generated code.\n\n',
     f'// Autocorrection dictionary ({len(autocorrections)} entries):\n',
-    ''.join(sorted(f'//   {typo:<{len(max_typo)}} -> {correction}\n'
-                   for typo, correction in autocorrections)),
+    ''.join(sorted(f'//   {text:<{len(max_typo)}} -> {correction}\n'
+                   for typo, text, correction in autocorrections)),
     f'\n#define AUTOCORRECTION_MIN_LENGTH {len(min_typo)}  // "{min_typo}"\n',
     f'#define AUTOCORRECTION_MAX_LENGTH {len(max_typo)}  // "{max_typo}"\n\n',
     textwrap.fill('static const uint8_t autocorrection_data[%d] PROGMEM = {%s};' % (
