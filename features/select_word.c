@@ -49,6 +49,10 @@ void select_word_task(void) {
 
 bool mac_hotkeys(void) { return keymap_config.swap_lctl_lgui; }
 
+__attribute__((weak)) bool is_select_line(uint8_t mods) {
+  return mods & MOD_MASK_SHIFT || mods & MOD_MASK_CTRL;
+}
+
 bool process_select_word(uint16_t keycode, keyrecord_t* record,
                          uint16_t sel_keycode) {
   if (keycode == KC_LSFT || keycode == KC_RSFT) {
@@ -62,10 +66,10 @@ bool process_select_word(uint16_t keycode, keyrecord_t* record,
   if (keycode == sel_keycode && record->event.pressed) {  // On key press.
     const uint8_t mods = get_mods();
 #ifndef NO_ACTION_ONESHOT
-    const bool shifted = (mods | get_oneshot_mods()) & MOD_MASK_SHIFT;
+    const bool shifted = is_select_line(mods | get_oneshot_mods());
     clear_oneshot_mods();
 #else
-    const bool shifted = mods & MOD_MASK_SHIFT;
+    const bool shifted = is_select_line(mods);
 #endif  // NO_ACTION_ONESHOT
 
     if (!shifted) {  // Select word.
@@ -104,7 +108,9 @@ if (mac_hotkeys()) {
         set_mods(mods);
         state = STATE_FIRST_LINE;
       } else {
+        set_mods(MOD_BIT(KC_LSFT));
         register_code(KC_DOWN);
+        set_mods(mods);
         state = STATE_LINE;
       }
     }
