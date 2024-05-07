@@ -61,11 +61,11 @@ except ImportError:
         'correctly spelled word. To check for this, install the english_words '
         'package and rerun this script:\n\n  pip install english_words\n')
   # Use a minimal word list as a fallback.
-  CORRECT_WORDS = ('apparent', 'association', 'available', 'classification',
+  CORRECT_WORDS = {'apparent', 'association', 'available', 'classification',
                    'effect', 'entertainment', 'fantastic', 'information',
                    'integrate', 'international', 'language', 'loosest',
                    'manual', 'nothing', 'provides', 'reference', 'statehood',
-                   'technology', 'virtually', 'wealthier', 'wonderful')
+                   'technology', 'virtually', 'wealthier', 'wonderful'}
 
 
 # https://github.com/words
@@ -92,9 +92,6 @@ dicts = [enchant.Dict(l) for l in languages]
 def check_word(word):
     return any(d.check(word) for d in dicts)
 
-# colemak
-tr = str.maketrans('abcsftdhuneimky;qprglvwxjzo', 'abcdefghijklmnopqrstuvwxyz;')
-
 KC_A = 4
 KC_SPC = 0x2c
 KC_SCLN = 0x33
@@ -118,8 +115,9 @@ args = parser.parse_args()
 
 # ./make_autocorrection_data.py autocorrection_dict_extra_colemak.txt -l colemak
 if args.layout == 'colemak':
-    TYPO_CHARS[';'] = KC_SCLN
-    del TYPO_CHARS['p']
+    tr = str.maketrans('abcsftdhuneimky;qprglvwxjzo', 'abcdefghijklmnopqrstuvwxyz;')
+else:
+    tr = {}
 
 def parse_file(file_name: str) -> List[Tuple[str, str, str]]:
   """Parses autocorrections dictionary file.
@@ -300,7 +298,7 @@ def encode_link(link: Dict[str, Any]) -> List[int]:
   """Encodes a node link as two bytes."""
   byte_offset = link['byte_offset']
   if not (0 <= byte_offset <= 0xffff):
-    print('Error: The autocorrection table is too large, a node link exceeds '
+    print(f'Error: The autocorrection table is too large ({byte_offset}), a node link exceeds '
           '64KB limit. Try reducing the autocorrection dict to fewer entries.')
     sys.exit(1)
   return [byte_offset & 255, byte_offset >> 8]
@@ -343,7 +341,7 @@ def get_default_h_file(dict_file: str) -> str:
 
 
 def main(argv):
-  dict_file = args.dict_filename or 'autocorrection_dict.txt'
+  dict_file = args.dict_filename or 'autocorrection_dict_extra.txt'
   h_file = args.header_filename or get_default_h_file(dict_file)
 
   autocorrections = parse_file(dict_file)
