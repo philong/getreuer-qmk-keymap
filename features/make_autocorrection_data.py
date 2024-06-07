@@ -151,6 +151,7 @@ def parse_file(file_name: str) -> List[Tuple[str, str, str]]:
         print(f'Error:{line_number}: Typos may not be substrings of one '
               f'another, otherwise the longer typo would never trigger: '
               f'"{typo}" vs. "{other_typo}".')
+        continue
         sys.exit(1)
     if len(typo) < 5:
       print(f'Warning:{line_number}: It is suggested that typos are at '
@@ -316,6 +317,9 @@ def write_generated_code(autocorrections: List[Tuple[str, str]],
   """
   assert all(0 <= b <= 255 for b in data)
 
+  is_qmk = file_name.endswith('autocorrect_data.h')
+  prefix = 'autocorrect' if is_qmk else 'autocorrection'
+
   def typo_len(e: Tuple[str, str]) -> int:
     return len(e[0])
 
@@ -326,10 +330,11 @@ def write_generated_code(autocorrections: List[Tuple[str, str]],
     f'// Autocorrection dictionary ({len(autocorrections)} entries):\n',
     ''.join(sorted(f'//   {text:<{len(max_typo)}} -> {correction}\n'
                    for typo, text, correction in autocorrections)),
-    f'\n#define AUTOCORRECTION_MIN_LENGTH {len(min_typo)}  // "{min_typo}"\n',
-    f'#define AUTOCORRECTION_MAX_LENGTH {len(max_typo)}  // "{max_typo}"\n\n',
-    textwrap.fill('static const uint8_t autocorrection_data[%d] PROGMEM = {%s};' % (
-      len(data), ', '.join(map(str, data))), width=80, subsequent_indent='  '),
+    f'\n#define {prefix.upper()}_MIN_LENGTH {len(min_typo)}  // "{min_typo}"\n',
+    f'#define {prefix.upper()}_MAX_LENGTH {len(max_typo)}  // "{max_typo}"\n\n',
+    f'#define DICTIONARY_SIZE {len(data)}\n\n',
+    textwrap.fill('static const uint8_t %s_data[DICTIONARY_SIZE] PROGMEM = {%s};' % (
+      prefix, ', '.join(map(str, data))), width=80, subsequent_indent='  '),
     '\n\n'])
 
   with open(file_name, 'wt') as f:
