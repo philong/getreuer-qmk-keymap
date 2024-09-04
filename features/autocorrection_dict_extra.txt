@@ -133,8 +133,8 @@ firts         -> first
 follwo        -> follow
 :foudn        -> found
 frequecy      -> frequency
-firend        -> friend
-:freind        -> friend
+firend:       -> friend
+:freind       -> friend
 heigth        -> height
 iamge         -> image
 :inital       -> initial
