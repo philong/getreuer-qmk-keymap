@@ -692,7 +692,7 @@ wierd         -> weird
 :aplyed: -> applied
 :apparant: -> apparent
 :apparantly: -> apparently
-:appart: -> apart
+#:appart: -> apart
 :appartment: -> apartment
 :appartments: -> apartments
 :appeareance: -> appearance
